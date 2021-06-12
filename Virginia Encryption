@@ -1,0 +1,201 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<string.h>
+#define MAX_LEN 100000
+#define N 127
+
+char fileread[] = "D://Visual Stdio//source//repos//转换后的文件.txt";
+char filewrite[] = "D://Visual Stdio//source//repos//加密后的文件.txt";
+char frequency1[] = "D://Visual Stdio//source//repos//维吉尼亚加密//frequency1.txt";
+char frequency2[] = "D://Visual Stdio//source//repos//维吉尼亚加密//frequency2.txt";
+char frequency3[] = "D://Visual Stdio//source//repos//维吉尼亚加密//frequency3.txt";
+char buf[MAX_LEN];
+char buf1[MAX_LEN];
+char buf2[MAX_LEN];
+char buf3[MAX_LEN];
+int s[N];
+int SINGLE[N];
+int DOUBLE[N][N];
+int TRIPLE[N][N][N];
+
+//统计总字符和单字符
+void FSINGLE(char* filename) {
+	FILE* fp,*fq;
+	char* p;
+	int m = 0;
+	char ch;
+	memset(SINGLE, 0, sizeof(int) * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(frequency1, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf1, sizeof(buf1), fp) != NULL) {
+		p = buf1;
+		while ((*p) != '\0') {
+			SINGLE[*p]++;
+			p++;
+		}
+	}
+	printf("总字符:");
+	for (int i = 97; i <= 122; i++)
+		m += SINGLE[i];
+	printf("%d\n", m);
+	puts("单字符：");
+	for (int i = 97; i <= 122; i++) {
+		ch = i;
+		printf("字母：%c  频数：%5d  频率：%.4f\n", ch, SINGLE[i], (float)SINGLE[i] / (float)m);
+		fprintf(fq, "%c %.4f\n",ch, (float)SINGLE[i] / (float)m);
+	}
+	fclose(fq);
+	fclose(fp);
+}
+
+
+//统计双字符
+void FDOUBLE(char* filename) {
+	FILE* fp,*fq;
+	char* p, * q;
+	char ch, cp;
+	int m = 0, n = 0;
+	int flag = 0;
+	memset(DOUBLE, 0, sizeof(int) * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(frequency2, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf2, sizeof(buf2), fp) != NULL) {	//fgets函数遇到EOF时返回NULL
+		p = buf2;
+		q = p + 1;
+		while ((*q) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n') {
+				p++;
+			}
+			else {
+				DOUBLE[*p][*q]++;
+				m++;
+			}
+			p++;
+			q = p + 1;
+		}
+	}
+	printf("总的双字母组合%d\n", m);
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			if (DOUBLE[i][j] != 0) {
+				ch = i; cp = j;
+				printf("组合：%c%c 频数：%5d  频率：%.4f	", ch, cp, DOUBLE[i][j], (float)DOUBLE[i][j] / (float)m);
+				if ((++flag) % 4 == 0)
+					printf("\n");
+			}
+			fprintf(fq, "%.4f  ", (float)DOUBLE[i][j] / (float)m);
+		}
+		fprintf(fq,"\n");
+	}
+	printf("\n");
+	fclose(fq);
+	fclose(fp);
+}
+//统计三字符
+void FTRIPLE(char* filename) {
+	FILE* fp,*fq;
+	char* p, * q, * s;
+	char ch, cp, cs;
+	int m = 0, flag = 0;
+	memset(TRIPLE, 0, sizeof(int) * N * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(frequency3, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf3, sizeof(buf3), fp) != NULL) {
+		p = buf3; q = p + 1; s = q + 1;
+		while ((*s) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n')
+				p++;
+			else {
+				TRIPLE[*p][*q][*s]++;
+				m++;
+			}
+			p++; q = p + 1; s = q + 1;
+		}
+	}
+	printf("总的三字母组合：%d\n", m);
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			for (int k = 97; k <= 122; k++) {
+				if (TRIPLE[i][j][k] != 0) {
+					ch = i; cp = j; cs = k;
+					printf("组合：%c%c%c 频数：%5d 频率：%.8f  ", ch, cp, cs, TRIPLE[i][j][k], (float)TRIPLE[i][j][k] / (float)m);
+					if ((++flag) % 3 == 0)
+						printf("\n");
+				}
+				fprintf(fq, "%c%c%c  %.8f\n", i, j, k, (float)TRIPLE[i][j][k] / (float)m);
+			}
+		}
+	}
+	fclose(fp);
+	fclose(fq);
+}
+int main(void) {
+	FILE* fp, * fq;
+	char* p;
+	int i = 0;
+	char ch;
+	int key[] = { '2','2','4','4','5','3','6','3','1','1' };
+	////生成随机密钥
+	//int key[10];
+	//srand(time(NULL)); // use current time as seed for random generator
+	//int random_variable = rand();
+	//printf("Random value on [0,%d]: %d\n", RAND_MAX, random_variable);
+
+	//// roll a 6-sided die 20 times
+	//for (int n = 0; n != 10; ++n) {
+	//    int x = 7;
+	//    while (x > 6)
+	//        x = 1 + rand() / ((RAND_MAX + 1u) / 6); // Note: 1+rand()%6 is biased
+	//    key[n] = x;
+	//}
+	//printf("密钥为：");
+	//for (int i = 0; i < 10; i++)
+	//    printf("%d", key[i]);
+	//printf("\n");
+	puts("加密密钥为：cceefdgdaa");
+	if ((fp = fopen(fileread, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(filewrite, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	//加密
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf;
+		while ((*p) != '\0') {
+			ch = (*p);
+			fputc((ch - 97 + key[i]) % 26 + 97, fq);
+			i++;
+			if (i % 10 == 0)
+				i = 0;
+			p++;
+		}
+	}
+	fclose(fp);
+	fclose(fq);
+	FSINGLE(filewrite);
+	FDOUBLE(filewrite);
+	FTRIPLE(filewrite);
+}
