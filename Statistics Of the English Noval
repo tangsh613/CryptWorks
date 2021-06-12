@@ -1,0 +1,194 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#define MAX_LEN 100000
+#define N 127
+
+char buf[MAX_LEN];
+//int s[MAX_LEN];
+int s[N];
+int DOUBLE[N][N];
+int TRIPLE[N][N][N];
+char filename[] = "D://Visual Stdio//source//repos//英文书籍.txt";
+char writefile[] = "D://Visual Stdio//source//repos//转换后的文件.txt";
+char frequency1[] = "D://Visual Stdio//source//repos//统计英文书籍//frequency1.txt";
+char frequency2[] = "D://Visual Stdio//source//repos//统计英文书籍//frequency2.txt";
+char frequency3[] = "D://Visual Stdio//source//repos//统计英文书籍//frequency3.txt";
+
+//统计总字符和单字符
+void FSINGLE(char* filename) {
+	FILE* fp,*fq;
+	int SINGLE[N];
+	char* p;
+	int m = 0;
+	char ch;
+	memset(SINGLE, 0, sizeof(int) * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(frequency1, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf;
+		while ((*p) != '\0') {
+			SINGLE[*p]++;
+			p++;
+		}
+	}
+	printf("总字符:");
+	for (int i = 97; i <= 122; i++)
+		m += SINGLE[i];
+	printf("%d\n", m);
+	puts("单字符：");
+	for (int i = 97; i <= 122; i++) {
+		ch = i;
+		printf("字母：%c  频数：%5d  频率：%.4f\n", ch, SINGLE[i], (float)SINGLE[i] / (float)m);
+		fprintf(fq,"%c  %.4f\n",ch, (float)SINGLE[i] / (float)m);
+	}
+	fprintf(fq, "\n\n\n");
+	fclose(fp);
+	fclose(fq);
+}
+
+
+//统计双字符
+void FDOUBLE(char* filename) {
+	FILE* fp,*fq;
+	char* p, * q;
+	char ch, cp;
+	int m = 0, n = 0;
+	int flag = 0;
+	memset(DOUBLE, 0, sizeof(int) * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(frequency2, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {	//fgets函数遇到EOF时返回NULL
+		p = buf;
+		q = p + 1;
+		while ((*q) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n') {
+				p++;
+			}
+			else {
+				DOUBLE[*p][*q]++;
+				m++;
+			}
+			p++;
+			q = p + 1;
+		}
+	}
+	printf("总的双字母组合%d\n", m);
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			if (DOUBLE[i][j] != 0) {
+				ch = i; cp = j;
+				printf("组合：%c%c 频数：%5d  频率：%.4f	", ch, cp, DOUBLE[i][j], (float)DOUBLE[i][j] / (float)m);
+				if ((++flag) % 4 == 0)
+					printf("\n");
+			}
+		}
+	}
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			fprintf(fq, "%.4f  ", (float)DOUBLE[i][j] / (float)m);
+		}
+		fprintf(fq, "\n");
+	}
+	fprintf(fq, "\n\n\n");
+	printf("\n");
+	fclose(fp);
+	fclose(fq);
+}
+//统计三字符
+void FTRIPLE(char* filename) {
+	FILE* fp,*fq;
+	char* p, * q, * s;
+	char ch, cp, cs;
+	int m = 0, flag = 0;
+	memset(TRIPLE, 0, sizeof(int) * N * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(frequency3, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf; q = p + 1; s = q + 1;
+		while ((*s) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n')
+				p++;
+			else {
+				TRIPLE[*p][*q][*s]++;
+				m++;
+			}
+			p++; q = p + 1; s = q + 1;
+		}
+	}
+	printf("总的三字母组合：%d\n", m);
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			for (int k = 97; k <= 122; k++) {
+				if (TRIPLE[i][j][k] != 0) {
+					ch = i; cp = j; cs = k;
+					printf("组合：%c%c%c 频数：%5d 频率：%.8f  ", ch, cp, cs, TRIPLE[i][j][k], (float)TRIPLE[i][j][k] / (float)m);
+					fprintf(fq, "%c%c%c  %.8f\n", ch, cp, cs, (float)TRIPLE[i][j][k] / (float)m);
+					if ((++flag) % 3 == 0)
+						printf("\n");
+				}
+			}
+		}
+	}
+	fclose(fq);
+	fclose(fp);
+}
+
+int main(void) {
+	FILE* fp, * fq;
+	char* p, * q, * r, * pp;
+	char ch, cp, cq;
+	int m = 0; int n = 0; int t = 0;
+	memset(s, 0, sizeof(int) * N);
+
+	//if ((fp = fopen(filename, "rb")) == NULL) {
+	//	puts("ERROR!");
+	//	exit(0);
+	//}
+	//if ((fq = fopen(writefile, "wb")) == NULL) {
+	//	puts("ERROR!");
+	//	exit(0);
+	//}
+	//while (fgets(buf, sizeof(buf), fp) != NULL) {
+	//	pp = buf;
+	//	while ((*pp) != '\0') {
+	//		if ((*pp) == ' ' || (*pp) == '\n')
+	//			pp++;
+	//		else {
+	//			if ((*pp) >= 97 && (*pp) <= 122) {
+	//				ch = (*pp);
+	//				fputc(ch, fq);
+	//			}
+	//			if ((*pp) >= 65 && (*pp) <= 90) {
+	//				ch = (*pp) + 32;
+	//				fputc(ch, fq);
+	//			}
+	//			pp++;
+	//		}
+	//	}
+	//}
+	////将filename中的内容除去空格和换行符后写入writefile中，且只写入英文字母，大写转化为小写
+
+	FSINGLE(writefile);
+	FDOUBLE(writefile);
+	FTRIPLE(writefile);
+}
