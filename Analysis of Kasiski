@@ -1,0 +1,166 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#define MAX_LEN 10000
+#define N 127
+
+char filename[] = "D://Visual Stdio//source//repos//截取一段密文.txt";
+int SINGLE[N];
+int DOUBLE[N][N];
+int TRIPLE[N][N][N];
+char buf[MAX_LEN];
+char temp[3];
+
+/*
+//统计总字符和单字符
+void FSINGLE(char* filename) {
+	FILE* fp;
+	int SINGLE[N];
+	char* p;
+	int m = 0;
+	char ch;
+	memset(SINGLE, 0, sizeof(int) * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf;
+		while ((*p) != '\0') {
+			SINGLE[*p]++;
+			p++;
+		}
+	}
+	printf("总字符:");
+	for (int i = 97; i <= 122; i++)
+		m += SINGLE[i];
+	printf("%d\n", m);
+	puts("单字符：");
+	for (int i = 97; i <= 122; i++) {
+		ch = i;
+		printf("字母：%c  频数：%5d  频率：%.4f\n", ch, SINGLE[i], (float)SINGLE[i] / (float)m);
+	}
+	fclose(fp);
+}
+
+
+//统计双字符
+void FDOUBLE(char* filename) {
+	FILE* fp;
+	char* p, * q;
+	char ch, cp;
+	int m = 0, n = 0;
+	int flag = 0;
+	memset(DOUBLE, 0, sizeof(int) * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {	//fgets函数遇到EOF时返回NULL
+		p = buf;
+		q = p + 1;
+		while ((*q) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n') {
+				p++;
+			}
+			else {
+				DOUBLE[*p][*q]++;
+				m++;
+			}
+			p++;
+			q = p + 1;
+		}
+	}
+	printf("总的双字母组合%d\n", m);
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			if (DOUBLE[i][j] != 0) {
+				ch = i; cp = j;
+				printf("组合：%c%c 频数：%5d  频率：%.4f	", ch, cp, DOUBLE[i][j], (float)DOUBLE[i][j] / (float)m);
+				if ((++flag) % 4 == 0)
+					printf("\n");
+			}
+		}
+	}
+	printf("\n");
+	fclose(fp);
+}*/
+//统计三字符
+void FTRIPLE(char* filename) {
+	FILE* fp;
+	char* p, * q, * s;
+	char ch, cp, cs;
+	int m = 0, flag = 0;
+	int place = 1, i = 0;
+	memset(TRIPLE, 0, sizeof(int) * N * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf; q = p + 1; s = q + 1;
+		while ((*s) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n')
+				p++;
+			else {
+				TRIPLE[*p][*q][*s]++;
+				m++;
+			}
+			p++; q = p + 1; s = q + 1;
+		}
+	}
+	printf("总的三字母组合：%d\n", m);
+	for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			for (int m = 97; m <= 122; m++) {
+				if (TRIPLE[i][j][m] >= flag) {
+					flag = TRIPLE[i][j][m];
+					temp[0] = i;
+					temp[1] = j;
+					temp[2] = m;
+				}
+			}
+		}
+	}
+	printf("密文中出现次数最多的字段为：%c%c%c\n", temp[0], temp[1], temp[2]);
+	printf("出现次数为：%d\n", TRIPLE[temp[0]][temp[1]][temp[2]]);
+	int M[15];
+	printf("出现的位置是：");
+	p = buf; q = p + 1; s = q + 1;
+	while ((*s) != '\0') {
+		if ((*p) == temp[0]) {
+			if ((*q) == temp[1]) {
+				if ((*s) == temp[2]) {
+					printf("%d	", place);
+					M[i] = place;
+					i++;
+				}
+			}
+		}
+		place++;
+		p++;
+		q = p + 1;
+		s = q + 1;
+	}
+	printf("\n");
+	printf("间隔为：");
+	for (int j = 0; j < 14; j++) {
+		printf("%d	", M[j + 1] - M[j]);
+	}
+	/*for (int i = 97; i <= 122; i++) {
+		for (int j = 97; j <= 122; j++) {
+			for (int m = 97; m <= 122; m++) {
+				if (TRIPLE[i][j][m] != 0) {
+					ch = i; cp = j; cs = m;
+					printf("组合：%c%c%c 频数：%5d 频率：%.4f  ", ch, cp, cs, TRIPLE[i][j][m], (float)TRIPLE[i][j][m] / (float)m);
+					if ((++flag) % 3 == 0)
+						printf("\n");
+				}
+			}
+		}
+	}*/
+}
+int main(void) {
+	FTRIPLE(filename);
+}
