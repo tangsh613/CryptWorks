@@ -1,0 +1,173 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#define MAX_LEN 10000
+#define N 127
+
+int DOUBLE[N][N];
+int TRIPLE[N][N][N];
+
+char buf[MAX_LEN];
+char buf1[MAX_LEN];
+char filename[] = "D://Visual Stdio//source//repos//密文.txt";
+char s[] = "D://Visual Stdio//source//repos//统计一段文字//除去空格和换行符.txt";
+char s1[] = "D://Visual Stdio//source//repos//统计一段文字//单字符.txt";
+char s2[] = "D://Visual Stdio//source//repos//统计一段文字//双字符.txt";
+char s3[] = "D://Visual Stdio//source//repos//统计一段文字//三字符.txt";
+
+//统计总字符和单字符
+void FSINGLE(char* filename) {
+	FILE* fp, * fq;
+	int SINGLE[N];
+	char* p;
+	int m = 0;
+	char ch;
+	memset(SINGLE, 0, sizeof(int) * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(s1, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf;
+		while ((*p) != '\0') {
+			SINGLE[*p]++;
+			p++;
+		}
+	}
+	printf("总字符:");
+	for (int i = 33; i < 126; i++)
+		m += SINGLE[i];
+	printf("%d\n", m);
+	puts("单字符：");
+	for (int i = 33; i < 126; i++) {
+		if (SINGLE[i] != 0) {
+			ch = i;
+			printf("字符：%c 频数：%4d 频率：%.4f\n", ch, SINGLE[i], (float)SINGLE[i] / (float)m);
+			fprintf(fq, "%c %.4f\n", ch, (float)SINGLE[i] / (float)m);
+		}
+	}
+	fclose(fp);
+	fclose(fq);
+}
+
+//统计双字符
+void FDOUBLE(char* filename) {
+	FILE* fp, * fq;
+	char* p, * q;
+	char ch, cp;
+	int m = 0;
+	memset(DOUBLE, 0, sizeof(int) * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(s2, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {	//fgets函数遇到EOF时返回NULL
+		p = buf;
+		q = p + 1;
+		while ((*q) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n') {
+				p++;
+			}
+			else {
+				DOUBLE[*p][*q]++;
+				m++;
+			}
+			p++;
+			q = p + 1;
+		}
+	}
+	printf("总的双字母组合%d\n", m);
+	for (int i = 33; i < 127; i++) {
+		for (int j = 33; j < 127; j++) {
+			if (DOUBLE[i][j] != 0) {
+				ch = i; cp = j;
+				printf("组合：%c%c频数：%d 频率：%.4f\n", ch, cp, DOUBLE[i][j], (float)DOUBLE[i][j] / (float)m);
+				fprintf(fq, "%c%c %.4f\n", ch, cp, (float)DOUBLE[i][j] / (float)m);
+			}
+		}
+	}
+	fclose(fp);
+	fclose(fq);
+}
+
+//统计三字符
+void FTRIPLE(char* filename) {
+	FILE* fp, * fq;
+	char* p, * q, * s;
+	char ch, cp, cs;
+	int m = 0;
+	memset(TRIPLE, 0, sizeof(int) * N * N * N);
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(s3, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
+		p = buf; q = p + 1; s = q + 1;
+		while ((*s) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n')
+				p++;
+			else {
+				TRIPLE[*p][*q][*s]++;
+				m++;
+			}
+			p++; q = p + 1; s = q + 1;
+		}
+	}
+	printf("总的三字母组合：%d\n", m);
+	for (int i = 33; i < 127; i++)
+		for (int j = 33; j < 127; j++)
+			for (int k = 33; k < 127; k++)
+				if (TRIPLE[i][j][k] != 0) {
+					ch = i; cp = j; cs = k;
+					printf("组合：%c%c%c 频数：%4d 频率：%.4f\n", ch, cp, cs, TRIPLE[i][j][k], (float)TRIPLE[i][j][k] / (float)m);
+					fprintf(fq, "%c%c%c %.4f\n", ch, cp, cs, (float)TRIPLE[i][j][k] / (float)m);
+				}
+}
+int main() {
+	FILE* fp, * fq;
+	char* p;
+	char ch;
+	puts("统计的字符ASCII码为33-126");
+
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	if ((fq = fopen(s, "wb")) == NULL) {
+		puts("ERROR!");
+		exit(0);
+	}
+	while (fgets(buf1, sizeof(buf1), fp) != NULL) {
+		p = buf1;
+		while ((*p) != '\0') {
+			if ((*p) == ' ' || (*p) == '\n')
+				p++;
+			else {
+				ch = (*p);
+				fputc(ch, fq);
+				p++;
+			}
+		}
+	}
+	fclose(fp);
+	fclose(fq);
+	FSINGLE(s);
+	printf("\n\n\n");
+	FDOUBLE(s);
+	printf("\n\n\n");
+	FTRIPLE(s);
+
+}
